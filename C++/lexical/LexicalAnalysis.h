@@ -17,7 +17,7 @@ class LexicalAnalysis {
 		LexicalAnalysis(const char* filename);
 		virtual ~LexicalAnalysis();
 
-		int line() const { return m_line; };
+		int line() const;
 
 		struct Lexeme nextToken();
 

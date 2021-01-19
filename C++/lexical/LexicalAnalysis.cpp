@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cctype>
 #include <cassert>
+#include <string>
 
 #include "LexicalAnalysis.h"
 
@@ -24,40 +25,40 @@ struct Lexeme LexicalAnalysis::nextToken() {
     int state = 1;
     while (state != 12 && state != 13) {
         int c = getc(m_file);
-        
+
         switch (state) {
             case 1:
-                // TODO: Implement me!
+
                 break;
             case 2:
-                // TODO: Implement me!
+
                 break;
             case 3:
-                // TODO: Implement me!
+
                 break;
             case 4:
-                // TODO: Implement me!
+
                 break;
             case 5:
-                // TODO: Implement me!
+
                 break;
             case 6:
-                // TODO: Implement me!
+
                 break;
             case 7:
-                // TODO: Implement me!
+
                 break;
             case 8:
-                // TODO: Implement me!
+
                 break;
             case 9:
-                // TODO: Implement me!
+
                 break;
             case 10:
-                // TODO: Implement me!
+
                 break;
             case 11:
-                // TODO: Implement me!
+
                 break;
             default:
                 assert(false);

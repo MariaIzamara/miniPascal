@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
 
 /*
         // O código a seguir é dado para testar o interpretador.
-        // TODO: descomentar depois que o analisador léxico estiver OK.
+        // TO DO: descomentar depois que o analisador léxico estiver OK.
         SyntaticAnalysis s(l);
         Command* c = s.start();
         c->execute();
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 */
 
         // O código a seguir é usado apenas para testar o analisador léxico.
-        // TODO: depois de pronto, comentar o código abaixo.
+        // TO DO: depois de pronto, comentar o código abaixo.
         struct Lexeme lex;
         while ((lex = l.nextToken()).type > 0) {
             printf("(\"%s\", %d)\n", lex.token.c_str(), lex.type);

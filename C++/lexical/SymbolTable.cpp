@@ -52,12 +52,9 @@ SymbolTable::~SymbolTable() {
 }
 
 bool SymbolTable::contains(std::string token) {
-	// se eu procurar o token e chegar no fim, então quer dizer que ele não encontrou e ai retorna falso
-    return m_st.find(token) != m_st.end();
+	return m_st.find(token) != m_st.end();
 }
 
 enum TokenType SymbolTable::find(std::string token) {
-	// consulta na tabela se existe o token, se existir consulta na tabela, senão retorna token invalido
-    return this->contains(token) ?
-        m_st[token] : TKN_INVALID_TOKEN;
-}
+	return this->contains(token) ?
+        m_st[token] : TKN_VAR;
