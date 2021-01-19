@@ -1,8 +1,6 @@
 #include "SymbolTable.h"
 
 SymbolTable::SymbolTable() {
-    m_st["("] = TKN_OPEN_PAR;
-
     // SYMBOLS
     m_st["."] = TKN_DOT;
     m_st[","] = TKN_COMMA;
@@ -54,10 +52,10 @@ SymbolTable::~SymbolTable() {
 }
 
 bool SymbolTable::contains(std::string token) {
-    return m_st.find(token) != m_st.end();
+	return m_st.find(token) != m_st.end();
 }
 
 enum TokenType SymbolTable::find(std::string token) {
-    return this->contains(token) ?
-              m_st[token] : TKN_INVALID_TOKEN;
+	return this->contains(token) ?
+        m_st[token] : TKN_VAR;
 }
