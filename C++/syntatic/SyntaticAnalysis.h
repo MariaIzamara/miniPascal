@@ -44,7 +44,6 @@ private:
     void procInteger();
     void procReal();
     void procString();
-
 };
 
 #endif

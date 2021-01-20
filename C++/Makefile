@@ -6,6 +6,7 @@ TARGET=mpasi
 OBJS=mpasi.o \
 	 lexical/SymbolTable.o \
 	 lexical/LexicalAnalysis.o \
+	 syntatic/SyntaticAnalysis.o \
 
 all: $(TARGET)
 
@@ -20,6 +21,8 @@ mpasi.o:
 lexical/SymbolTable.o: lexical/TokenType.h
 
 lexical/LexicalAnalysis.o: lexical/TokenType.h lexical/SymbolTable.h
+
+syntatic/SyntaticAnalysis.o: lexical/LexicalAnalysis.h
 
 $(TARGET):  $(OBJS)
 			$(CXX) -o $(TARGET) $(OBJS)

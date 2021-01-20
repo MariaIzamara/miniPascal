@@ -71,6 +71,7 @@ struct Lexeme LexicalAnalysis::nextToken() {
 				if (c == '*') {
 					state = 3;
 				} else {
+					lex.token += '(';
 					if (c != -1)
 						ungetc(c, m_file);
 					state = 12;
