@@ -90,6 +90,18 @@ void SyntaticAnalysis::procVar() {
 	matchToken(TKN_SEMICOLON);
 }
 
+// <body>     ::= <block> | <cmd>
+void SyntaticAnalysis::procBody() {
+	if (m_current.type == TKN_BEGIN)
+		procBlock();
+	else if (m_current.type == TKN_ID || m_current.type == TKN_IF || m_current.type == TKN_CASE ||
+			 m_current.type == TKN_WHILE || m_current.type == TKN_FOR || m_current.type == TKN_REPEAT ||
+			 m_current.type == TKN_WRITE || m_current.type == TKN_WRITELN || m_current.type == TKN_READLN)
+		procCmd();
+	else
+		showError();
+}
+
 // <block>    ::= begin [ <cmd> { ';' <cmd> } ] end
 void SyntaticAnalysis::procBlock() {
 	matchToken(TKN_BEGIN);
@@ -103,18 +115,6 @@ void SyntaticAnalysis::procBlock() {
 		}
 	}
 	matchToken(TKN_END);
-}
-
-// <body>     ::= <block> | <cmd>
-void SyntaticAnalysis::procBody() {
-	if (m_current.type == TKN_BEGIN)
-		procBlock();
-	else if (m_current.type == TKN_ID || m_current.type == TKN_IF || m_current.type == TKN_CASE ||
-			 m_current.type == TKN_WHILE || m_current.type == TKN_FOR || m_current.type == TKN_REPEAT ||
-			 m_current.type == TKN_WRITE || m_current.type == TKN_WRITELN || m_current.type == TKN_READLN)
-		procCmd();
-	else
-		showError();
 }
 
 // <cmd>      ::= <assign> | <if> | <case> | <while> | <for> | <repeat> | <write> | <read>
@@ -135,6 +135,8 @@ void SyntaticAnalysis::procCmd() {
 		procWrite();
 	else if (m_current.type == TKN_READLN)
 		procRead();
+	else
+		showError();
 }
 
 // <assign>   ::= <id> := <expr>
@@ -244,12 +246,12 @@ void SyntaticAnalysis::procRead() {
 	matchToken(TKN_CLOSE_PAR);
 }
 
-// <boolexpr> ::= [ not ] <cmpexpr> { (and | or) <boolexpr> }
+// <boolexpr> ::= [ not ] <cmpexpr> [ (and | or) <boolexpr> ]
 void SyntaticAnalysis::procBoolExpr() {
 	if (m_current.type == TKN_NOT)
 		matchToken(TKN_NOT);
 	procCmpExpr();
-	while (m_current.type == TKN_AND || m_current.type == TKN_OR) {
+	if (m_current.type == TKN_AND || m_current.type == TKN_OR) {
 		if (m_current.type == TKN_AND)
 			matchToken(TKN_AND);
 		else if (m_current.type == TKN_OR)
@@ -260,41 +262,24 @@ void SyntaticAnalysis::procBoolExpr() {
 	}
 }
 
-// <cmpexpr>  ::= <expr> ('=' | '<>' | '<' | '>' | '<=' | '>=') <expr> | '(' <boolexpr> ')'
+// <cmpexpr>  ::= <expr> ('=' | '<>' | '<' | '>' | '<=' | '>=') <expr>
 void SyntaticAnalysis::procCmpExpr() {
-	if (m_current.type == TKN_OPEN_PAR) {
-		matchToken(TKN_OPEN_PAR);
-		procBoolExpr();
-		matchToken(TKN_CLOSE_PAR);
-	} else if (m_current.type == TKN_INTEGER || m_current.type == TKN_REAL ||
-		m_current.type == TKN_STRING || m_current.type == TKN_ID ||
-		m_current.type == TKN_OPEN_PAR) {
-		procExpr();
-		switch (m_current.type) {
-			case TKN_EQUAL:
-				matchToken(TKN_EQUAL);
-				break;
-			case TKN_NOT_EQUAL:
-				matchToken(TKN_NOT_EQUAL);
-				break;
-			case TKN_LOWER:
-				matchToken(TKN_LOWER);
-				break;
-			case TKN_GREATER:
-				matchToken(TKN_GREATER);
-				break;
-			case TKN_LOWER_EQ:
-				matchToken(TKN_LOWER_EQ);
-				break;
-			case TKN_GREATER_EQ:
-				matchToken(TKN_GREATER_EQ);
-				break;
-			default:
-				showError();
-		}
-		procExpr();
-	} else
+	procExpr();
+	if (m_current.type == TKN_EQUAL)
+		matchToken(TKN_EQUAL);
+	else if (m_current.type == TKN_NOT_EQUAL)
+		matchToken(TKN_NOT_EQUAL);
+	else if (m_current.type == TKN_LOWER)
+		matchToken(TKN_LOWER);
+	else if (m_current.type == TKN_GREATER)
+		matchToken(TKN_GREATER);
+	else if (m_current.type == TKN_LOWER_EQ)
+		matchToken(TKN_LOWER_EQ);
+	else if (m_current.type == TKN_GREATER_EQ)
+		matchToken(TKN_GREATER_EQ);
+	else
 		showError();
+	procExpr();
 }
 
 // <expr>     ::= <term> { ('+' | '-') <term> }

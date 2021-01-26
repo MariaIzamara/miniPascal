@@ -1,3 +1,4 @@
+(* a program to check triangles' dimensions *)
 program triangle;
 
 const
@@ -14,19 +15,19 @@ begin
 
     write('(', a, ', ', b, ', ', c, ') ');
 
-    if (a + b <= c) or (a + c <= b) or (b + c <= a) then
+    if (a + b) <= c or (a + c) <= b or (b + c) <= a then
         begin
           writeln('is an invalid triangle');
           valid := 0
         end
     else
-      if (a = b) and (b = c) then
+      if a = b and b = c then
         writeln('is an equilateral triangle')
-      else if (a = b) or (a = c) or (b = c) then
+      else if a = b or a = c or b = c then
         writeln('is a isosceles triangle')
       else
         writeln('is a scalene triangle');
 
-    writeln();
+    writeln()
   until valid = 0
 end.

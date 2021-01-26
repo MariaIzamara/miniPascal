@@ -4,8 +4,8 @@ var
   a;
 
 begin
-  write('Entrada: ');
+  write('Value: ');
   readln(a);
 
-  writeln('Você entrou com ', a)
+  writeln('You entered: ', a)
 end.
