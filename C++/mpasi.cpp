@@ -13,17 +13,17 @@ int main(int argc, char* argv[]) {
     try {
         LexicalAnalysis l(argv[1]);
 
-/*
-        // O código a seguir é dado para testar o interpretador.
-        // TO DO: descomentar depois que o analisador léxico estiver OK.
-        SyntaticAnalysis s(l);
-        Command* c = s.start();
-        c->execute();
-        delete c;
-*/
 
-        // O código a seguir é usado apenas para testar o analisador léxico.
-        // TO DO: depois de pronto, comentar o código abaixo.
+        // The following code is given to test the interpreter.
+
+        SyntaticAnalysis s(l);
+		s.start();
+        //Command* c = s.start();
+        //c->execute();
+        //delete c;
+
+        // The following code is used only to test the lexical analyzer.
+/*
         struct Lexeme lex;
         while ((lex = l.nextToken()).type > 0) {
             printf("(\"%s\", %s)\n", lex.token.c_str(), tt2str(lex.type).c_str());
@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
                 printf("(\"%s\", %s)\n", lex.token.c_str(), tt2str(lex.type).c_str());
                 break;
         }
+*/
     } catch (std::string msg) {
         fprintf(stderr, "Internal error: %s\n", msg.c_str());
         return 2;
