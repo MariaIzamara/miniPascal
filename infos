@@ -1,0 +1,21 @@
+#       para protegidos
+-       para privados
++       para publicos
+itálico para abstratos
+
+Observações:
+Todo construtor precisa ter um destrutor
+exemplo:
+  contrutor - Command(int line) : m_line(line) {}
+  destrutor - virtual ~Command() {}
+
+Onde tiver Value<?> no diagrama de classes, substituir por Type*
+
+Para fazer o OutputCommand herdar de Command é só fazer: class OutputCommand : public Command {};
+
+virtual indica que o metódo precisa ser sobrescrito por outro (não é abstrato), por exemplo o
+execute no Command, cada classe executa de um jeito
+
+Se a classe tem um método abstrato, ela também é abstrata, ou seja, não vai ter o .cpp
+
+Todo destrutor é virtual e deveria ser público
