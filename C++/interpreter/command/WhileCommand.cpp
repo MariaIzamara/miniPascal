@@ -1,21 +1,17 @@
 //Executar o bloco do corpo da repetição enquanto a expressão for verdadeira
+#include "WhileCommand.h"
+#include "../expr/BoolExpr.h"
 
-#include<stdio.h>
-#include<iostream.h>
+WhileCommand::WhileCommand(int line, BoolExpr* cond, Command* cmds)
+	: Command(line), m_cond(cond), m_cmds(cmds) {
+}
 
-public class WhileCommand extends Command {
+WhileCommand::~WhileCommand() {
+	delete m_cond;
+	delete m_cmds;
+}
 
-    private BoolRxExpr cond;
-    private Command cmds;
-
-    public WhileCommand(int line, BoolExpr cond, Command cmds){
-        super(line);        this.cond=cond;
-        this.cmds=cmds;
-
-
-    public void execute(){
-        while(cond.expr())
-            cmds.execute;
-    }
-
+void WhileCommand::execute() {
+	while (m_cond->expr())
+		m_cmds->execute();
 }

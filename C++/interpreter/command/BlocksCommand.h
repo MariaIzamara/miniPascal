@@ -1,19 +1,19 @@
-#ifndef BLOCKCOMMAND_H
-#define BLOCKCOMMAND_H
+#ifndef BLOCKS_COMMAND_H
+#define BLOCKS_COMMAND_H
 
-class BlocksCommand {
-public:
-    virtual ~BlocksCommand() {}
+#include <list>
+#include "Command.h"
 
-    virtual void execute() = 0;
-	// virtual void addCommand(cmd Command) = 0
+class BlocksCommand : public Command {
+	public:
+		BlocksCommand(int line);
+		virtual ~BlocksCommand();
 
-protected:
-    explicit BlocksCommand(int line) : m_line(line) {}
+		void addCommand(Command* cmd);
+		virtual void execute();
 
-private:
-    int m_line;
-
+	private:
+		std::list<Command*> m_cmds;
 };
 
 #endif
