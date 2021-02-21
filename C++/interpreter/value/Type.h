@@ -12,7 +12,7 @@ class Type {
         Type(Type::ValueType type) : m_type(type) {}
         virtual ~Type() {}
 
-        Type::ValueType type() const { return m_type; }
+        virtual Type::ValueType type(){ return m_type; };
 
     private:
         Type::ValueType m_type;
