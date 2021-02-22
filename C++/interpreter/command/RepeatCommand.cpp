@@ -1,23 +1,15 @@
-#include <stdio.h>
+#include "RepeatCommand.h"
 
-public class RepeatCommand extends Command {
+RepeatCommand::RepeatCommand(int line, std::List<Command*> cmds, BoolExpr *cond): Command(line), cmds(cmds), cond(cond){};
 
-    private BoolExpr cond;
-    private std::List<Command> exprs;
+RepeatCommand::~RepeatCommand(){}
 
-    public WriteCommand(int line, bool writeln = false){
+void RepeatCommand::execute(){
+	do{
+		for(std::List<Command*>::iterator i = cmds.begin(), e = cmds.end(); i!=e; i++){
+			Command *m = i;
+			m->execute();
+		}
 
-        public void addExpr(Expr expr){
-
-        }
-
-        public void execute(){
-
-        }
-
+	}while(cond->expr());
 }
-
-
-
-
-

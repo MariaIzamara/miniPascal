@@ -4,15 +4,13 @@
 
 WriteCommand::WriteCommand(int line, bool writeln): Command(line), writeln(writeln) {}
 
-WriteCommand::~WriteCommand(){
-
-}
+WriteCommand::~WriteCommand(){}
 
 void WriteCommand::addExpr(Expr* expr){
 	exprs.push_back(expr);
 }
 
-void WriteCommand::Execute(){
+void WriteCommand::execute(){
 	if (writeln){
 		for(std::List<Expr*>::iterator i = exprs.begin(), e = exprs.end(); i != e; i++){
 			Expr* ex = *i;
@@ -47,7 +45,7 @@ void WriteCommand::Execute(){
 			}
 			else{
 				StringValue* StrV = (StringValue *)ty;
-				std::cout << (StrV->value()) << std::endL;
+				std::cout << (StrV->value()) << std::endl;
 			}
 
 

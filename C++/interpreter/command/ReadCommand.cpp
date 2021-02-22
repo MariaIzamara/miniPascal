@@ -10,7 +10,7 @@ ReadCommand::addVariable(Variable* var){
 	vars.push_back(var);
 }
 
-void ReadCommand::Execute(){
+void ReadCommand::execute(){
 
 	for(std::List<Variable*>:: iterator i = vars.begin(), e= vars.end(); i!=e; i++){
 		Variable* var = *i;
