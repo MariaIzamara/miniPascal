@@ -4,6 +4,9 @@
 #include "BoolExpr.h"
 #include "Expr.h"
 #include "RelOp.h"
+#include "../value/IntegerValue.h"
+#include "../value/RealValue.h"
+#include "../value/StringValue.h"
 
 class SingleBoolExpr : public BoolExpr {
 	public:

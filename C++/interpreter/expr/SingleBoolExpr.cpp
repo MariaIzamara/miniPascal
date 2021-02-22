@@ -1,12 +1,13 @@
 #include "SingleBoolExpr.h"
 
-SingleBoolExpr::SingleBoolExpr(int line, Expr* left, enum SingleBoolExpr::Op RelOp, Expr* right)
-	: BoolExpr(line), m_left(left), RelOp(RelOp), m_right(right) {
+SingleBoolExpr::SingleBoolExpr(int line, Expr* left, RelOp* op, Expr* right)
+	: BoolExpr(line), m_left(left), m_op(op), m_right(right) {
 }
 
 SingleBoolExpr::~SingleBoolExpr() {
-	delete m_right;
 	delete m_left;
+	delete m_op;
+	delete m_right;
 }
 
 int SingleBoolExpr::line(){
@@ -14,47 +15,41 @@ int SingleBoolExpr::line(){
 }
 
 bool SingleBoolExpr::expr() {
-	Type* type0 = m_left -> expr();
-	Type* type1 = m_right -> expr();
+	Type* type_left = m_left -> expr();
+	Type* type_right = m_right -> expr();
 
-	float var1= 0.0,
-	      var2= 0.0;
+	float var_left = 0, var_right = 0;
 
-	if(type0->type()==Type::IntegerType)
-		var1=((IntegerValue*) type0) -> value();
-	else if(type0->type()==Type::RealType)
-		var1=((RealValue*) type0) -> value();
+	if(type_left->type() == Type::IntegerType)
+		var_left = ((IntegerValue*) type_left) -> value();
+	else if(type_left->type() == Type::RealType)
+		var_left = ((RealValue*) type_left) -> value();
 
-	if(type1->type()==Type::IntegerType)
-		var2=((IntegerValue*) type1) -> value();
-	else if(type1->type()==Type::RealType)
-		var2=((RealValue*) type1) -> value();
+	if(type_right->type() == Type::IntegerType)
+		var_right = ((IntegerValue*) type_right) -> value();
+	else if(type_right->type() == Type::RealType)
+		var_right = ((RealValue*) type_right) -> value();
 
-	switch(RelOp){
+	switch(*SingleBoolExpr::m_op) {
+		case RelOp::Equal:
+			return var_left == var_right;
+			break;
+		case RelOp::NotEqual:
+			return var_left != var_right;
+			break;
+		case RelOp::LowerThan:
+			return var_left < var_right;
+			break;
+		case RelOp::LowerEqual:
+			return var_left <= var_right;
+			break;
+		case RelOp::GreaterThan:
+			return var_left > var_right;
+			break;
+		case RelOp::GreaterEqual:
+			return var_left >= var_right;
+			break;
 		default:
 			return NULL;
-			break;
-		case SingleBoolExpr::EQUAL:
-			return var1 == var2;
-			break;
-		case SingleBoolExpr::NOT_EQUAL:
-			return var1 != var2;
-			break;
-		case SingleBoolExpr::GREATER_EQUAL:
-			return var1 >= var2;
-			break;
-		case SingleBoolExpr::GREATER_THAN:
-			return var1 > var2;
-			break;
-		case SingleBoolExpr::LOWER_EQUAL:
-			return var1 <= var2;
-			break;
-		case SingleBoolExpr::LOWER_THAN:
-			return var1 < var2;
-			break;
-
-
-
 	}
-
 }
