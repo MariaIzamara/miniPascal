@@ -7,6 +7,8 @@ ConstExpr::~ConstExpr() {
 }
 
 Type* ConstExpr::expr() {
+	return m_value;
 }
+
 
 
