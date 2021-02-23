@@ -5,19 +5,18 @@
 #include <set>
 #include <string>
 #include "../value/Type.h"
-#include "../value/StringValue.h"
 
 class Memory {
 	public:
-		static void registryVariable(StringValue* name, Type* value = NULL);
-		static void registryConstant(StringValue* name, Type* value);
+		static void registryVariable(const std::string& name, Type* value = NULL);
+		static void registryConstant(const std::string& name, Type* value);
 
-		static Type* read(StringValue* name);
-		static void write(StringValue* name, Type* value);
+		static Type* read(const std::string& name);
+		static void write(const std::string& name, Type* value);
 
 	private:
-		static std::map<StringValue*, Type*> m_memory;
-		static std::set<StringValue*> m_consts;
+		static std::map<std::string, Type*> m_memory;
+		static std::set<std::string> m_consts;
 };
 
 #endif
