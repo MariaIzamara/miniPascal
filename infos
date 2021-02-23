@@ -11,7 +11,7 @@ exemplo:
 
 Onde tiver Value<?> no diagrama de classes, substituir por Type*
 
-Para fazer o OutputCommand herdar de Command é só fazer: class OutputCommand : public Command {};
+Para fazer o OutputCommand herdar de Command é só fazer "class OutputCommand : public Command {};"
 
 virtual indica que o metódo precisa ser sobrescrito por outro (não é abstrato), por exemplo o
 execute no Command, cada classe executa de um jeito
@@ -20,8 +20,6 @@ Se a classe tem um método abstrato, ela também é abstrata, ou seja, não vai 
 
 Todo destrutor é virtual e deveria ser público
 
-
 () obrigatório ter pelo menos uma das opções
 [] opcional
 {} iteração
-<cmpexp> = SingleBoolExp

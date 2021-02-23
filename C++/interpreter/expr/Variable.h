@@ -2,6 +2,7 @@
 #define VARIABLE_H
 
 #include "Expr.h"
+#include "../util/Memory.h"
 #include "../value/StringValue.h"
 #include "../value/Type.h"
 
