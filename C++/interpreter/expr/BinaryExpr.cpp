@@ -1,6 +1,6 @@
 #include "BinaryExpr.h"
 
-BinaryExpr::BinaryExpr(int line, Expr* left, enum BinaryExpr::BinaryOp op, Expr* right)
+BinaryExpr::BinaryExpr(int line, Expr* left, BinaryOp* op, Expr* right)
 	: Expr(line), m_left(left), m_op(op), m_right(right) {
 }
 
@@ -10,30 +10,29 @@ BinaryExpr::~BinaryExpr() {
 }
 
 Type* BinaryExpr::expr() {
-	Type* type0 = m_right -> expr();
-	Type* type1 = m_left -> expr();
+	Type* type_left = m_left -> expr();
+	Type* type_right = m_right -> expr();
 
-	int var1 =((IntegerValue*)type0)->value(),
-		var2 =((IntegerValue*)type1)->value();
+	int var_left = ((IntegerValue*)type_left)->value(),
+		var_right = ((IntegerValue*)type_right)->value();
 
-		switch(m_op){
-			default:
+	switch(*BinaryExpr::m_op) {
+		case BinaryOp::AddOp:
+			return new IntegerValue(var_left+var_right);
+			break;
+		case BinaryOp::SubOp:
+			return new IntegerValue(var_left-var_right);
+			break;
+		case BinaryOp::MulOp:
+			return new IntegerValue(var_left*var_right);
+			break;
+		case BinaryOp::DivOp:
+			return new IntegerValue(var_left/var_right);
+			break;
+		case BinaryOp::ModOp:
+			return new IntegerValue(var_left%var_right);
+			break;
+		default:
 			return NULL;
-			break;
-			case BinaryOp::ModOp:
-			return new IntegerValue(var1%var2);
-			break;
-			case BinaryOp::AddOp:
-			return new IntegerValue(var1+var2);
-			break;
-			case BinaryOp::MulOp:
-			return new IntegerValue(var1*var2);
-			break;
-			case BinaryOp::SubOp:
-			return new IntegerValue(var1-var2);
-			break;
-			case BinaryOp::DivOp:
-			return new IntegerValue(var1/var2);
-			break;
-		}
+	}
 }
