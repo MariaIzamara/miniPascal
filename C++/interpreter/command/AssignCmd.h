@@ -9,7 +9,6 @@ class AssignCommand : public Command{
     public:
         AssignCommand(int line, Variable* left, Expr* right);
         virtual ~AssignCommand();
-
         virtual void execute();
 
     private:

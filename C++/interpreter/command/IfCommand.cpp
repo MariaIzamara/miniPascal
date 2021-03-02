@@ -8,10 +8,11 @@ IfCommand::IfCommand(int line, BoolExpr* cond, Command* thenCmds, Command* elseC
 
 IfCommand::~IfCommand() {
 	delete m_cond;
-	delete m_thenCmds;
-	if (m_elseCmds)
-		delete m_elseCmds;
 }
+
+void IfCommand::setElseCommands(Command* elseCmds){
+  m_elseCmds = elseCmds;
+};
 
 void IfCommand::execute() {
 	if (m_cond->expr())

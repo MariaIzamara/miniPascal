@@ -7,13 +7,13 @@
 
 class RepeatCommand : public Command {
     public:
-		RepeatCommand(int line, std::List<Command*> cmds, BoolExpr* cond);
+		RepeatCommand(int line, std::list<Command*> cmds, BoolExpr* cond);
         virtual ~RepeatCommand();
         virtual void execute();
 
     private:
 		BoolExpr* m_cond;
-    	std::List<Command*> m_cmds;
+    	std::list<Command*> m_cmds;
 };
 
 #endif

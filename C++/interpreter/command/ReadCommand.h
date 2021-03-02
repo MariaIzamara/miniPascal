@@ -2,7 +2,7 @@
 #define READ_COMMAND_H
 
 #include <list>
-#include <stdio.h>
+#include <iostream>
 #include "Command.h"
 #include "../expr/Variable.h"
 #include "../value/IntegerValue.h"
@@ -17,7 +17,7 @@ class ReadCommand : public Command {
 		void execute();
 
 	private:
-		std::List<Variable*> m_vars;
+		std::list<Variable*> m_vars;
 };
 
 #endif

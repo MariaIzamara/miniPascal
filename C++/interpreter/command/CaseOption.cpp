@@ -5,6 +5,5 @@ CaseOption::CaseOption(Type* value, Command* cmd)
 };
 
 CaseOption::~CaseOption() {
-  delete m_cmd;
   delete m_value;
 };

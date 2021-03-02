@@ -1,4 +1,3 @@
-#include <iostream>
 #include "WriteCommand.h"
 
 WriteCommand::WriteCommand(int line, bool writeln) : Command(line), m_writeln(writeln) {
@@ -13,37 +12,33 @@ void WriteCommand::addExpr(Expr* expr){
 
 void WriteCommand::execute(){
 	if(m_writeln) {
-		for(std::List<Expr*>::iterator i = exprs.begin(), e = exprs.end(); i != e; i++) {
+		for(std::list<Expr*>::iterator i = m_exprs.begin(), e = m_exprs.end(); i != e; i++) {
 			Expr* ex = *i;
 			Type *ty = ex->expr();
 
 			if(ty->type() == Type::IntegerType) {
 				IntegerValue* IntV = (IntegerValue *)ty;
 				std::cout << (IntV->value()) << std::endl;
-			}
-			else if(ty->type() == Type::RealType) {
+			} else if(ty->type() == Type::RealType) {
 				RealValue* ReaV = (RealValue *)ty;
 				std::cout << (ReaV->value()) << std::endl;
-			}
-			else {
+			} else {
 				StringValue* StrV = (StringValue *)ty;
-				std::cout << (StrV->value()) << std::endL;
+				std::cout << (StrV->value()) << std::endl;
 			}
 		}
 	} else {
-		for(std::List<Expr*>::iterator i = exprs.begin(), e = exprs.end(); i != e; i++) {
+		for(std::list<Expr*>::iterator i = m_exprs.begin(), e = m_exprs.end(); i != e; i++) {
 			Expr *ex = *i;
 			Type *ty = ex->expr();
 
 			if(ty->type() == Type::IntegerType) {
 				IntegerValue* IntV = (IntegerValue *)ty;
 				std::cout << (IntV->value()) << std::endl;
-			}
-			else if(ty->type() == Type::RealType) {
+			} else if(ty->type() == Type::RealType) {
 				RealValue* ReaV = (RealValue *)ty;
 				std::cout << (ReaV->value()) << std::endl;
-			}
-			else {
+			} else {
 				StringValue* StrV = (StringValue *)ty;
 				std::cout << (StrV->value()) << std::endl;
 			}

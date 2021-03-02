@@ -2,6 +2,7 @@
 #define WRITE_COMMAND_H
 
 #include <list>
+#include <iostream>
 #include "Command.h"
 #include "../expr/Expr.h"
 #include "../value/IntegerValue.h"
@@ -17,7 +18,7 @@ class WriteCommand : public Command {
 
     private:
 		bool m_writeln;
-    	std::List<Expr*> m_exprs;
+    	std::list<Expr*> m_exprs;
 };
 
 #endif

@@ -7,11 +7,10 @@
 
 class CaseOption {
   public:
-    Type* m_value;
-    Command* m_cmd;
-
     CaseOption(Type* value, Command* cmd);
     virtual ~CaseOption();
+    Type* m_value;
+    Command* m_cmd;
 };
 
 #endif

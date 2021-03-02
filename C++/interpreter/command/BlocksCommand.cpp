@@ -5,10 +5,6 @@ BlocksCommand::BlocksCommand(int line)
 }
 
 BlocksCommand::~BlocksCommand() {
-	for (std::list<Command*>::iterator i = m_cmds.begin(), e = m_cmds.end(); i != e; i++) {
-		Command* cmd = *i;
-		delete cmd;
-	}
 }
 
 void BlocksCommand::addCommand(Command* cmd) {

@@ -1,18 +1,17 @@
 #include "./CaseCommand.h"
 
 CaseCommand::CaseCommand(int line, Expr* expr)
-  : Command(line), m_expr(expr) {
+  : Command(line), m_expr(expr), otherwise(NULL) {
 }
 
 CaseCommand::~CaseCommand() {
   for(CaseOption* opt:m_options) delete opt;
   delete m_expr;
-  delete m_otherwise;
 }
 
 void CaseCommand::addOption(Type* value, Command* cmd) {
-  CaseOption* co = new CaseOption(value, cmd);
-  m_options.push_back(co);
+  CaseOption* c = new CaseOption(value, cmd);
+  m_options.push_back(c);
 }
 
 void CaseCommand::setOtherwise(Command* cmd) {

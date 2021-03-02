@@ -7,16 +7,17 @@ ForCommand::ForCommand(int line, Variable* var, Expr* src, Expr* dst, Command* c
 ForCommand::~ForCommand() {
 	delete m_dst;
 	delete m_var;
-	delete m_cmd;
 	delete m_src;
 }
 
 void ForCommand::execute() {
 	m_var->setValue(m_src->expr());
+	int src = ((IntegerValue*) m_src->expr())->value();
+	int dst = ((IntegerValue*) m_dst->expr())->value();
 
-	for(int aux = (IntegerValue* m_src->expr()->value())+1, int aux0 = IntegerValue* m_dst->expr()->value(); aux < aux0; aux++){
+	while(src < dst){
 		m_cmd->execute();
-		m_var->setValue(new IntegerValue(aux));
+		m_var->setValue(new IntegerValue(src));
+		src++;
 	}
-
 }
