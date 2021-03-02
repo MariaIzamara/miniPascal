@@ -1,8 +1,6 @@
 #include <cstdlib>
 #include "SyntaticAnalysis.h"
 
-#include "../interpreter/command/Command.h"
-
 SyntaticAnalysis::SyntaticAnalysis(LexicalAnalysis& lex) :
     m_lex(lex), m_current(m_lex.nextToken()) {
 }
@@ -48,7 +46,7 @@ void SyntaticAnalysis::showError() {
 //                [ const <const> { <const> } ]
 //                [ var <var> { <var> } ]
 //                <block> '.'
-void SyntaticAnalysis::procProgram() {
+Command* SyntaticAnalysis::procProgram() {
 	matchToken(TKN_PROGRAM);
 	procId();
 	matchToken(TKN_SEMICOLON);
@@ -64,292 +62,414 @@ void SyntaticAnalysis::procProgram() {
 		while (m_current.type == TKN_ID)
 			procVar();
 	}
-	procBlock();
+	Command* cmd = procBlock();
 	matchToken(TKN_DOT);
+	return cmd;
 }
 
 // <const>    ::= <id> = <value> ';'
 void SyntaticAnalysis::procConst() {
-	procId();
+	Variable* var = procId();
 	matchToken(TKN_EQUAL);
-	procValue();
+	Type* value = procValue();
+	Memory::registryConstant(((std::string&)*var)->name(), value);
 	matchToken(TKN_SEMICOLON);
 }
 
 // <var>      ::= <id> { ',' <id> } [ = <value> ] ';'
 void SyntaticAnalysis::procVar() {
-	procId();
+	Variable* var = procId();
 	while (m_current.type == TKN_COMMA) {
 		matchToken(TKN_COMMA);
-		procId();
+		Variable* var = procId();
 	}
 	if (m_current.type == TKN_EQUAL) {
 		matchToken(TKN_EQUAL);
-		procValue();
+		Type* value = procValue();
 	}
 	matchToken(TKN_SEMICOLON);
 }
 
 // <body>     ::= <block> | <cmd>
-void SyntaticAnalysis::procBody() {
+Command* SyntaticAnalysis::procBody() {
 	if (m_current.type == TKN_BEGIN)
-		procBlock();
+		return procBlock();
 	else if (m_current.type == TKN_ID || m_current.type == TKN_IF || m_current.type == TKN_CASE ||
 			 m_current.type == TKN_WHILE || m_current.type == TKN_FOR || m_current.type == TKN_REPEAT ||
 			 m_current.type == TKN_WRITE || m_current.type == TKN_WRITELN || m_current.type == TKN_READLN)
-		procCmd();
+		return procCmd();
 	else
 		showError();
+
+	return NULL;
 }
 
 // <block>    ::= begin [ <cmd> { ';' <cmd> } ] end
-void SyntaticAnalysis::procBlock() {
-	matchToken(TKN_BEGIN);
-	if (m_current.type == TKN_ID || m_current.type == TKN_IF || m_current.type == TKN_CASE ||
-		m_current.type == TKN_WHILE || m_current.type == TKN_FOR || m_current.type == TKN_REPEAT ||
-		m_current.type == TKN_WRITE || m_current.type == TKN_WRITELN || m_current.type == TKN_READLN) {
-		procCmd();
-		while (m_current.type == TKN_SEMICOLON) {
-			matchToken(TKN_SEMICOLON);
-			procCmd();
-		}
-	}
-	matchToken(TKN_END);
+BlocksCommand* SyntaticAnalysis::procBlock()
+{
+    int line = m_lex.line();
+    BlocksCommand* blocksC = new BlocksCommand(line);
+    matchToken(TKN_BEGIN);
+    if (m_current.type == TKN_ID || m_current.type == TKN_IF || m_current.type == TKN_CASE || m_current.type == TKN_WHILE ||
+        m_current.type == TKN_FOR || m_current.type == TKN_REPEAT || m_current.type == TKN_WRITE || m_current.type == TKN_WRITELN || m_current.type == TKN_READLN){
+        blocksC->addCommand(procCmd());
+
+        while (m_current.type == TKN_SEMICOLON){
+            matchToken(TKN_SEMICOLON);
+            blocksC->addCommand(procCmd());
+        }
+    }
+    matchToken(TKN_END);
+    return blocksC;
 }
 
 // <cmd>      ::= <assign> | <if> | <case> | <while> | <for> | <repeat> | <write> | <read>
-void SyntaticAnalysis::procCmd() {
+Command* SyntaticAnalysis::procCmd() {
 	if (m_current.type == TKN_ID)
-		procAssign();
+		return procAssign();
 	else if (m_current.type == TKN_IF)
-		procIf();
+		return procIf();
 	else if (m_current.type == TKN_CASE)
-		procCase();
+		return procCase();
 	else if (m_current.type == TKN_WHILE)
-		procWhile();
+		return procWhile();
 	else if (m_current.type == TKN_FOR)
-		procFor();
+		return procFor();
 	else if (m_current.type == TKN_REPEAT)
-		procRepeat();
+		return procRepeat();
 	else if (m_current.type == TKN_WRITE || m_current.type == TKN_WRITELN)
-		procWrite();
+		return procWrite();
 	else if (m_current.type == TKN_READLN)
-		procRead();
+		return procRead();
 	else
 		showError();
+	return NULL;
 }
 
 // <assign>   ::= <id> := <expr>
-void SyntaticAnalysis::procAssign() {
-	procId();
-	matchToken(TKN_ASSIGN);
-	procExpr();
+AssignCommand* SyntaticAnalysis::procAssign() {
+	int line = m_lex.line();
+    Variable* var = procId();
+
+    matchToken(TKN_ASSIGN);
+
+    Expr* e = procExpr();
+    return new AssignCommand(line, var, e);
 }
 
 // <if>       ::= if <boolexpr> then <body> [else <body>]
-void SyntaticAnalysis::procIf() {
-	matchToken(TKN_IF);
-	procBoolExpr();
-	matchToken(TKN_THEN);
-	procBody();
-	if (m_current.type == TKN_ELSE) {
-		matchToken(TKN_ELSE);
-		procBody();
-	}
+IfCommand* SyntaticAnalysis::procIf(){
+    int line = m_lex.line();
+
+    matchToken(TKN_IF);
+    BoolExpr* ifCond = procBoolExpr();
+
+    matchToken(TKN_THEN);
+    Command* thenC = procBody();
+    IfCommand* ifC = new IfCommand(line, ifCond, thenC);
+
+    if (m_current.type == TKN_ELSE){
+        matchToken(TKN_ELSE);
+        Command* elseC = procBody();
+        ifC->setElseCommands(elseC);
+    }
+    return ifC;
 }
 
 // <case>     ::= case <expr> of { <value> : <body> ';' } [ else <body> ';' ] end
-void SyntaticAnalysis::procCase() {
-	matchToken(TKN_CASE);
-	procExpr();
-	matchToken(TKN_OF);
-	while (m_current.type == TKN_INTEGER || m_current.type == TKN_REAL || m_current.type == TKN_STRING) {
-		procValue();
-		matchToken(TKN_COLON);
-		procBody();
-		matchToken(TKN_SEMICOLON);
-	}
-	if (m_current.type == TKN_ELSE) {
-		matchToken(TKN_ELSE);
-		procBody();
-		matchToken(TKN_COMMA);
-	}
-	matchToken(TKN_AND);
+CaseCommand* SyntaticAnalysis::procCase(){
+    int line = m_lex.line();
+
+    matchToken(TKN_CASE);
+    Expr* expr = procExpr();
+    CaseCommand* caseC = new CaseCommand(line, expr);
+
+    matchToken(TKN_OF);
+
+    while(m_current.type == TKN_INTEGER || m_current.type == TKN_REAL ||m_current.type == TKN_STRING){
+        Type* value = procValue();
+        matchToken(TKN_COLON);
+        Command* cmd = procBody();
+        caseC->addOption(value, cmd);
+        matchToken(TKN_SEMICOLON);
+    }
+    if(m_current.type == TKN_ELSE){
+        matchToken(TKN_ELSE);
+
+        Command* cmd = procBody();
+        caseC->setOtherwise(cmd);
+        matchToken(TKN_SEMICOLON);
+    }
+
+    matchToken(TKN_END);
+    return caseC;
 }
 
 // <while>    ::= while <boolexpr> do <body>
-void SyntaticAnalysis::procWhile() {
-	matchToken(TKN_WHILE);
-	procBoolExpr();
-	matchToken(TKN_DO);
-	procBody();
+WhileCommand* SyntaticAnalysis::procWhile(){
+    int line = m_lex.line();
+
+    matchToken(TKN_WHILE);
+    BoolExpr* cond = procBoolExpr();
+
+    matchToken(TKN_DO);
+    Command* cmds = procBody();
+
+    return new WhileCommand(line, cond, cmds);
 }
 
 // <repeat>   ::= repeat [ <cmd> { ';' <cmd> } ] until <boolexpr>
-void SyntaticAnalysis::procRepeat() {
-	matchToken(TKN_REPEAT);
-	if (m_current.type == TKN_ID || m_current.type == TKN_IF || m_current.type == TKN_CASE ||
-		m_current.type == TKN_WHILE || m_current.type == TKN_FOR || m_current.type == TKN_REPEAT ||
-		m_current.type == TKN_WRITE || m_current.type == TKN_WRITELN || m_current.type == TKN_READLN) {
-		procCmd();
-		while (m_current.type == TKN_SEMICOLON) {
-			matchToken(TKN_SEMICOLON);
-			procCmd();
-		}
-	}
-	matchToken(TKN_UNTIL);
-	procBoolExpr();
+RepeatCommand* SyntaticAnalysis::procRepeat(){
+    int line = m_lex.line();
+
+    std::list<Command*> cmds = {};
+
+    matchToken(TKN_REPEAT);
+    if (m_current.type == TKN_ID || m_current.type == TKN_IF || m_current.type == TKN_CASE || m_current.type == TKN_WHILE ||
+        m_current.type == TKN_FOR || m_current.type == TKN_REPEAT || m_current.type == TKN_WRITE || m_current.type == TKN_WRITELN || m_current.type == TKN_READLN)
+    {
+        cmds.push_back(procCmd());
+        while (m_current.type == TKN_SEMICOLON)
+        {
+            matchToken(TKN_SEMICOLON);
+            cmds.push_back(procCmd());
+        }
+    }
+    matchToken(TKN_UNTIL);
+
+    BoolExpr* cond = procBoolExpr();
+
+    return new RepeatCommand(line, cmds, cond);
 }
 
 // <for>      ::= for <id> := <expr> to <expr> do <body>
-void SyntaticAnalysis::procFor() {
-	matchToken(TKN_FOR);
-	procId();
-	matchToken(TKN_ASSIGN);
-	procExpr();
-	matchToken(TKN_TO);
-	procExpr();
-	matchToken(TKN_DO);
-	procBody();
+ForCommand* SyntaticAnalysis::procFor(){
+    int line = m_lex.line();
+
+    matchToken(TKN_FOR);
+    Variable* var = procId();
+    Memory::registryVariable(var->name(), new IntegerValue(0));
+
+    matchToken(TKN_ASSIGN);
+    Expr* src = procExpr();
+
+    matchToken(TKN_TO);
+    Expr* dst = procExpr();
+
+    matchToken(TKN_DO);
+    Command* cmd = procBody();
+
+    return new ForCommand(line, var, src, dst, cmd);
 }
 
 // <write>    ::= (write | writeln) '(' [ <expr> { ',' <expr> } ] ')'
-void SyntaticAnalysis::procWrite() {
-	if (m_current.type == TKN_WRITE)
+WriteCommand* SyntaticAnalysis::procWrite() {
+	int line = m_lex.line();
+	WriteCommand* writec = new WriteCommand(line, false);
+	if (m_current.type == TKN_WRITE) {
 		matchToken(TKN_WRITE);
-	else if (m_current.type == TKN_WRITELN)
+	} else if (m_current.type == TKN_WRITELN) {
 		matchToken(TKN_WRITELN);
-	else
+		writec = new WriteCommand(line, true);
+	} else {
 		showError();
+	}
 	matchToken(TKN_OPEN_PAR);
 	if (m_current.type == TKN_INTEGER || m_current.type == TKN_REAL ||
 		m_current.type == TKN_STRING || m_current.type == TKN_ID ||
 		m_current.type == TKN_OPEN_PAR) {
-		procExpr();
+
+		writec->addExpr(procExpr());
 		while (m_current.type == TKN_COMMA) {
 			matchToken(TKN_COMMA);
-			procExpr();
+			writec->addExpr(procExpr());
 		}
 	}
 	matchToken(TKN_CLOSE_PAR);
+	return writec;
 }
 
 // <read>     ::= readln '(' <id> { ',' <id> } ')'
-void SyntaticAnalysis::procRead() {
+ReadCommand* SyntaticAnalysis::procRead() {
+	int line = m_lex.line();
+	ReadCommand* readC = new ReadCommand(line);
 	matchToken(TKN_READLN);
 	matchToken(TKN_OPEN_PAR);
-	procId();
+	Variable* var = procId();
+	readC->addVariable(var);
 	while (m_current.type == TKN_COMMA) {
 		matchToken(TKN_COMMA);
-		procId();
+		var = procId();
+		readC->addVariable(var);
 	}
 	matchToken(TKN_CLOSE_PAR);
+	return readC;
 }
 
 // <boolexpr> ::= [ not ] <cmpexpr> [ (and | or) <boolexpr> ]
-void SyntaticAnalysis::procBoolExpr() {
+BoolExpr* SyntaticAnalysis::procBoolExpr() {
+	int line = m_lex.line();
+	bool falseBoolEx = false;
 	if (m_current.type == TKN_NOT)
+	    falseBoolEx = true;
 		matchToken(TKN_NOT);
-	procCmpExpr();
+	BoolExpr* left = procCmpExpr();
 	if (m_current.type == TKN_AND || m_current.type == TKN_OR) {
-		if (m_current.type == TKN_AND)
+		BoolOp op;
+		if (m_current.type == TKN_AND){
+			op = BoolOp::And;
 			matchToken(TKN_AND);
-		else if (m_current.type == TKN_OR)
+		}else if (m_current.type == TKN_OR){
+			op = BoolOp::Or;
 			matchToken(TKN_OR);
-		else
+		}else
 			showError();
-		procBoolExpr();
+
+		BoolExpr* right = procBoolExpr();
+		left = new CompositeBoolExpr(line, left, op, right);
 	}
+
+	if(falseBoolEx)
+		return new NotBoolExpr(line, left);
+	else
+		return left;
 }
 
 // <cmpexpr>  ::= <expr> ('=' | '<>' | '<' | '>' | '<=' | '>=') <expr>
-void SyntaticAnalysis::procCmpExpr() {
-	procExpr();
-	if (m_current.type == TKN_EQUAL)
+SingleBoolExpr* SyntaticAnalysis::procCmpExpr() {
+	int line = m_lex.line();
+	Expr* left = procExpr();
+	RelOp op;
+	if (m_current.type == TKN_EQUAL){
+		op = RelOp::Equal;
 		matchToken(TKN_EQUAL);
-	else if (m_current.type == TKN_NOT_EQUAL)
+	}else if (m_current.type == TKN_NOT_EQUAL){
+		op = RelOp::NotEqual;
 		matchToken(TKN_NOT_EQUAL);
-	else if (m_current.type == TKN_LOWER)
+	}else if (m_current.type == TKN_LOWER){
+		op = RelOp::LowerThan;
 		matchToken(TKN_LOWER);
-	else if (m_current.type == TKN_GREATER)
+	}else if (m_current.type == TKN_GREATER){
+		op = RelOp::GreaterThan;
 		matchToken(TKN_GREATER);
-	else if (m_current.type == TKN_LOWER_EQ)
+	}else if (m_current.type == TKN_LOWER_EQ){
+		op = RelOp::LowerEqual;
 		matchToken(TKN_LOWER_EQ);
-	else if (m_current.type == TKN_GREATER_EQ)
+	}else if (m_current.type == TKN_GREATER_EQ){
+		op = RelOp::GreaterEqual;
 		matchToken(TKN_GREATER_EQ);
-	else
+	}else
 		showError();
-	procExpr();
+	Expr* right = procExpr();
+	return new SingleBoolExpr(line, left, op, right);
 }
 
 // <expr>     ::= <term> { ('+' | '-') <term> }
-void SyntaticAnalysis::procExpr() {
-	procTerm();
+Expr* SyntaticAnalysis::procExpr() {
+	int line = m_lex.line();
+	Expr* left = procTerm();
+	BinaryOp op;
 	while (m_current.type == TKN_ADD || m_current.type == TKN_SUB) {
-		if (m_current.type == TKN_ADD)
+		if (m_current.type == TKN_ADD){
+			op = BinaryOp::AddOp;
 			matchToken(TKN_ADD);
-		else if (m_current.type == TKN_SUB)
+		}else if (m_current.type == TKN_SUB){
+			op = BinaryOp::SubOp;
 			matchToken(TKN_SUB);
-		else
+		}else
 			showError();
-		procTerm();
+		Expr* right = procTerm();
+		left = new BinaryExpr(line, left, op, right);
 	}
+	return left;
 }
 
 // <term>     ::= <factor> { ('*' | '/' | '%') <factor> }
-void SyntaticAnalysis::procTerm() {
-	procFactor();
+Expr* SyntaticAnalysis::procTerm() {
+	int line = m_lex.line();
+	BinaryOp op;
+	Expr* left = procFactor();
 	while (m_current.type == TKN_MUL || m_current.type == TKN_DIV || m_current.type == TKN_MOD) {
-		if (m_current.type == TKN_MUL)
+		if (m_current.type == TKN_MUL){
+			op = BinaryOp::MulOp;
 			matchToken(TKN_MUL);
-		else if (m_current.type == TKN_DIV)
+		}else if (m_current.type == TKN_DIV){
+			op = BinaryOp::DivOp;
 			matchToken(TKN_DIV);
-		else if (m_current.type == TKN_MOD)
+		}else if (m_current.type == TKN_MOD){
+			op = BinaryOp::ModOp;
 			matchToken(TKN_MOD);
-		else
+		}else
 			showError();
-		procFactor();
+
+		Expr* right = procFactor();
+		left = new BinaryExpr(line, left, op, right);
 	}
+	return left;
 }
 
 // <factor>   ::= <value> | <id> | '(' <expr> ')'
-void SyntaticAnalysis::procFactor() {
-	if (m_current.type == TKN_INTEGER || m_current.type == TKN_REAL || m_current.type == TKN_STRING)
-		procValue();
-	else if (m_current.type == TKN_ID)
-		procId();
-	else if (m_current.type == TKN_OPEN_PAR) {
+Expr* SyntaticAnalysis::procFactor() {
+	if (m_current.type == TKN_INTEGER || m_current.type == TKN_REAL || m_current.type == TKN_STRING){
+		int line = m_lex.line();
+		Type* value = procValue();
+		ConstExpr* constEx = new ConstExpr(line, value);
+		return constEx;
+	}else if (m_current.type == TKN_ID){
+		return procId();
+	}else if (m_current.type == TKN_OPEN_PAR) {
 		matchToken(TKN_OPEN_PAR);
-		procExpr();
+
+		return procExpr();
+
 		matchToken(TKN_CLOSE_PAR);
 	} else
 		showError();
+
+	return NULL;
 }
 
 // <value>    ::= <integer> | <real> | <string>
-void SyntaticAnalysis::procValue() {
-	if (m_current.type == TKN_INTEGER)
-		procInteger();
-	else if (m_current.type == TKN_REAL)
-		procReal();
-	else if (m_current.type == TKN_STRING)
-		procString();
-	else
+Type* SyntaticAnalysis::procValue() {
+	if (m_current.type == TKN_INTEGER){
+		return procInteger();
+	}else if (m_current.type == TKN_REAL){
+		return procReal();
+	}else if (m_current.type == TKN_STRING){
+		return procString();
+	}else
 		showError();
+	return NULL;
 }
 
-void SyntaticAnalysis::procId() {
+Variable* SyntaticAnalysis::procId() {
+	std::string name = m_current.token;
 	matchToken(TKN_ID);
+	int line = m_lex.line();
+	Variable* var = new Variable(line, name);
+	return var;
 }
 
-void SyntaticAnalysis::procInteger() {
+IntegerValue* SyntaticAnalysis::procInteger() {
+	std::string tmp = m_current.token;
 	matchToken(TKN_INTEGER);
+	int value = atoi(tmp.c_str());
+	IntegerValue* integerV = new IntegerValue(value);
+	return integerV;
 }
 
-void SyntaticAnalysis::procReal() {
+RealValue* SyntaticAnalysis::procReal() {
+	std::string tmp = m_current.token;
 	matchToken(TKN_REAL);
+	float value = std::stof(tmp);
+	RealValue* realV = new RealValue(value);
+	return realV;
 }
 
-void SyntaticAnalysis::procString() {
+StringValue* SyntaticAnalysis::procString() {
+	std::string tmp = m_current.token;
+	tmp = tmp.substr(1, tmp.length()-2);
 	matchToken(TKN_STRING);
+	StringValue* stringV = new StringValue(tmp);
+	return stringV;
 }
