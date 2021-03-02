@@ -1,11 +1,9 @@
 #ifndef ASSIGN_COMMAND_H
 #define ASSIGN_COMMAND_H
 
-#include "../Command.h"
+#include "Command.h"
+#include "../expr/Expr.h"
 #include "../expr/Variable.h"
-
-class Variable;
-class Expr;
 
 class AssignCommand : public Command{
     public:

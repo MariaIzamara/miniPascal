@@ -1,17 +1,17 @@
+#include <iostream>
 #include "ReadCommand.h"
 
-ReadCommand::ReadCommand(int line):Command (line){};
-
-ReadCommand::~ReadCommand(){
-
+ReadCommand::ReadCommand(int line) : Command (line) {
 }
 
-ReadCommand::addVariable(Variable* var){
-	vars.push_back(var);
+ReadCommand::~ReadCommand() {
 }
 
-void ReadCommand::execute(){
+void ReadCommand::addVariable(Variable* var) {
+	m_vars.push_back(var);
+}
 
+void ReadCommand::execute() {
 	for(std::List<Variable*>:: iterator i = vars.begin(), e= vars.end(); i!=e; i++){
 		Variable* var = *i;
 
@@ -34,12 +34,5 @@ void ReadCommand::execute(){
 			IntegerValue* intV = new IntegerValue(val);
 			var->setValue(intV);
 		}
-
 	}
-
-
-
-
-
-
-}
+};

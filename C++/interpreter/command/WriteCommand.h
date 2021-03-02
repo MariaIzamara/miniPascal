@@ -3,15 +3,21 @@
 
 #include <list>
 #include "Command.h"
+#include "../expr/Expr.h"
+#include "../value/IntegerValue.h"
+#include "../value/RealValue.h"
+#include "../value/StringValue.h"
 
-public class WriteCommand extends Command {
+class WriteCommand : public Command {
+    public:
+		WriteCommand(int line, bool writeln = false);
+		virtual ~WriteCommand();
+        void addExpr(Expr* expr);
+		void execute();
 
-    private bool writeln;
-    private std::List<Expr> exprs;
+    private:
+		bool m_writeln;
+    	std::List<Expr*> m_exprs;
+};
 
-    public WriteCommand(int line, bool writeln = false){
-
-        public void addExpr(Expr expr);
-
-        public void execute();
-}
+#endif

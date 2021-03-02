@@ -1,8 +1,15 @@
 #ifndef SYNTATIC_ANALYSIS_H
 #define SYNTATIC_ANALYSIS_H
 
-#include "../lexical/LexicalAnalysis.h"
 #include <map>
+#include "../lexical/LexicalAnalysis.h"
+#include "../interpreter/value/Type.h"
+#include "../interpreter/command/Command.h"
+#include "../interpreter/command/WriteCommand.h"
+#include "../interpreter/command/ReadCommand.h"
+#include "../interpreter/expr/Expr.h"
+#include "../interpreter/expr/Variable.h"
+#include "../interpreter/expr/BoolExpr.h"
 
 class Command;
 

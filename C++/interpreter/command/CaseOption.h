@@ -2,8 +2,8 @@
 #define CASE_OPTION_COMMAND_H
 
 #include <list>
-#include "../../Command.h"
-#include "../../../value/Type.h"
+#include "Command.h"
+#include "../value/Type.h"
 
 class CaseOption {
   public:

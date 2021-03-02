@@ -8,7 +8,6 @@ class BlocksCommand : public Command {
 	public:
 		BlocksCommand(int line);
 		virtual ~BlocksCommand();
-
 		void addCommand(Command* cmd);
 		virtual void execute();
 

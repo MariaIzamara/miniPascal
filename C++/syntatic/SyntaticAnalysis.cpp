@@ -1,8 +1,6 @@
 #include <cstdlib>
 #include "SyntaticAnalysis.h"
 
-#include "../interpreter/command/Command.h"
-
 SyntaticAnalysis::SyntaticAnalysis(LexicalAnalysis& lex) :
     m_lex(lex), m_current(m_lex.nextToken()) {
 }
@@ -218,7 +216,7 @@ void SyntaticAnalysis::procFor() {
 }
 
 // <write>    ::= (write | writeln) '(' [ <expr> { ',' <expr> } ] ')'
-void SyntaticAnalysis::procWrite() {
+WriteCommand* SyntaticAnalysis::procWrite() {
 	int line = m_lex.line();
 	WriteCommand* writec = new WriteCommand(line, false);
 	if (m_current.type == TKN_WRITE)

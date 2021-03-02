@@ -2,25 +2,22 @@
 #define READ_COMMAND_H
 
 #include <list>
-#include "Command.h"
-
 #include <stdio.h>
+#include "Command.h"
+#include "../expr/Variable.h"
+#include "../value/IntegerValue.h"
+#include "../value/RealValue.h"
+#include "../value/StringValue.h"
 
-public class ReadCommand extends Command {
+class ReadCommand : public Command {
+    public:
+		ReadCommand(int line);
+		virtual ~ReadCommand();
+        void addVariable(Variable* var);
+		void execute();
 
-    private std::List<Command> vars;
+	private:
+		std::List<Variable*> m_vars;
+};
 
-    public ReadCommand(int line){
-
-        public void addVariable(Variable var){
-
-        }
-
-        public void execute(){
-
-        }
-}
-
-
-
-
+#endif

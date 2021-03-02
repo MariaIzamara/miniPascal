@@ -2,7 +2,6 @@
 #define EXPR_H
 
 #include "../value/Type.h"
-
 class Expr {
 	public:
 		virtual ~Expr();

@@ -17,5 +17,5 @@ void IfCommand::execute() {
 	if (m_cond->expr())
 		m_thenCmds->execute();
 	else if (m_elseCmds)
-			m_elseCmds->execute();
-	}
+		m_elseCmds->execute();
+}

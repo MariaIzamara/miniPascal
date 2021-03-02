@@ -3,17 +3,16 @@
 
 #include <list>
 #include "Command.h"
-#include "../expr/Expr.h"
 #include "CaseOption.h"
+#include "../expr/Expr.h"
 
 class CaseCommand : public Command{
     public:
         CaseCommand(int line, Expr* expr);
         virtual ~CaseCommand();
-
-        virtual void execute();
         virtual void addOption(Type* value, Command* cmd);
         virtual void setOtherwise(Command* cmd);
+        virtual void execute();
 
     private:
         Expr* m_expr;
