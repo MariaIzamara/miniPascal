@@ -1,13 +1,7 @@
 #include "Memory.h"
 
-void Memory::registryVariable(const std::string& name, Type* value) {
-	write(name, value);
-}
-
-void Memory::registryConstant(const std::string& name, Type* value) {
-	write(name, value);
-	m_consts.insert(name);
-}
+std::map<std::string, Type*> Memory::m_memory;
+std::set<std::string>, Memory::consts;
 
 Type* Memory::read(const std::string& name) {
 	return m_memory[name];
