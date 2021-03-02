@@ -4,6 +4,9 @@
 #include "Expr.h"
 #include "BinaryOp.h"
 #include "../value/Type.h"
+#include "../value/IntegerValue.h"
+#include "../value/RealValue.h"
+#include "../value/StringValue.h"
 
 class BinaryExpr : public Expr {
 	public:

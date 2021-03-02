@@ -7,11 +7,11 @@ Variable::~Variable() {
 }
 
 Type* Variable::expr() {
-	return Memory::read(name);
+	return Memory::read(m_name->value());
 }
 
 void Variable::setValue(Type* value) {
-	Memory::write(name, value);
+	Memory::write(m_name->value(), value);
 }
 
 StringValue* Variable::name(){

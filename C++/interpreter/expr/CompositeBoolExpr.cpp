@@ -15,13 +15,15 @@ int CompositeBoolExpr::line(){
 }
 
 bool CompositeBoolExpr::expr() {
+	bool var_left = m_left -> expr();
+	bool var_right = m_right -> expr();
 
 	switch(*CompositeBoolExpr::m_op) {
 		case BoolOp::And:
-			return ;
+			return var_left && var_right;
 			break;
 		case BoolOp::Or:
-			return ;
+			return var_left || var_right;
 			break;
 		default:
 			return NULL;
