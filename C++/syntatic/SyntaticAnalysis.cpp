@@ -72,7 +72,7 @@ void SyntaticAnalysis::procConst() {
 	Variable* var = procId();
 	matchToken(TKN_EQUAL);
 	Type* value = procValue();
-	Memory::registryConstant(var->getName(), value);
+	Memory::registryConstant(((std::string&)*var)->name(), value);
 	matchToken(TKN_SEMICOLON);
 }
 
@@ -248,7 +248,7 @@ ForCommand* SyntaticAnalysis::procFor(){
 
     matchToken(TKN_FOR);
     Variable* var = procId();
-    Memory::registryVariable(var->getName(), new IntegerValue(0));
+    Memory::registryVariable(var->name(), new IntegerValue(0));
 
     matchToken(TKN_ASSIGN);
     Expr* src = procExpr();
@@ -266,13 +266,14 @@ ForCommand* SyntaticAnalysis::procFor(){
 WriteCommand* SyntaticAnalysis::procWrite() {
 	int line = m_lex.line();
 	WriteCommand* writec = new WriteCommand(line, false);
-	if (m_current.type == TKN_WRITE)
+	if (m_current.type == TKN_WRITE) {
 		matchToken(TKN_WRITE);
-	else if (m_current.type == TKN_WRITELN)
+	} else if (m_current.type == TKN_WRITELN) {
 		matchToken(TKN_WRITELN);
 		writec = new WriteCommand(line, true);
-	else
+	} else {
 		showError();
+	}
 	matchToken(TKN_OPEN_PAR);
 	if (m_current.type == TKN_INTEGER || m_current.type == TKN_REAL ||
 		m_current.type == TKN_STRING || m_current.type == TKN_ID ||
@@ -314,12 +315,12 @@ BoolExpr* SyntaticAnalysis::procBoolExpr() {
 		matchToken(TKN_NOT);
 	BoolExpr* left = procCmpExpr();
 	if (m_current.type == TKN_AND || m_current.type == TKN_OR) {
-		enum CompositeBoolExpr:: BoolOp op;
+		BoolOp op;
 		if (m_current.type == TKN_AND){
-			op = CompositeBoolExpr::And;
+			op = BoolOp::And;
 			matchToken(TKN_AND);
 		}else if (m_current.type == TKN_OR){
-			op = CompositeBoolExpr::Or;
+			op = BoolOp::Or;
 			matchToken(TKN_OR);
 		}else
 			showError();
@@ -338,24 +339,24 @@ BoolExpr* SyntaticAnalysis::procBoolExpr() {
 SingleBoolExpr* SyntaticAnalysis::procCmpExpr() {
 	int line = m_lex.line();
 	Expr* left = procExpr();
-	enum SingleBoolExpr::Op op;
+	RelOp op;
 	if (m_current.type == TKN_EQUAL){
-		op = SingleBoolExpr::EQUAL;
+		op = RelOp::Equal;
 		matchToken(TKN_EQUAL);
 	}else if (m_current.type == TKN_NOT_EQUAL){
-		op = SingleBoolExpr::NOT_EQUAL;
+		op = RelOp::NotEqual;
 		matchToken(TKN_NOT_EQUAL);
 	}else if (m_current.type == TKN_LOWER){
-		op = SingleBoolExpr::LOWER_THAN;
+		op = RelOp::LowerThan;
 		matchToken(TKN_LOWER);
 	}else if (m_current.type == TKN_GREATER){
-		op = SingleBoolExpr::GREATER_THAN;
+		op = RelOp::GreaterThan;
 		matchToken(TKN_GREATER);
 	}else if (m_current.type == TKN_LOWER_EQ){
-		op = SingleBoolExpr::LOWER_EQUAL;
+		op = RelOp::LowerEqual;
 		matchToken(TKN_LOWER_EQ);
 	}else if (m_current.type == TKN_GREATER_EQ){
-		op = SingleBoolExpr::GREATER_EQUAL;
+		op = RelOp::GreaterEqual;
 		matchToken(TKN_GREATER_EQ);
 	}else
 		showError();
@@ -367,12 +368,13 @@ SingleBoolExpr* SyntaticAnalysis::procCmpExpr() {
 Expr* SyntaticAnalysis::procExpr() {
 	int line = m_lex.line();
 	Expr* left = procTerm();
+	BinaryOp op;
 	while (m_current.type == TKN_ADD || m_current.type == TKN_SUB) {
 		if (m_current.type == TKN_ADD){
-			op = BinaryExpr::AddOp;
+			op = BinaryOp::AddOp;
 			matchToken(TKN_ADD);
 		}else if (m_current.type == TKN_SUB){
-			op = BinaryExpr::SubOp;
+			op = BinaryOp::SubOp;
 			matchToken(TKN_SUB);
 		}else
 			showError();
@@ -385,17 +387,17 @@ Expr* SyntaticAnalysis::procExpr() {
 // <term>     ::= <factor> { ('*' | '/' | '%') <factor> }
 Expr* SyntaticAnalysis::procTerm() {
 	int line = m_lex.line();
-	enum BinaryExpr::BinaryOp op;
+	BinaryOp op;
 	Expr* left = procFactor();
 	while (m_current.type == TKN_MUL || m_current.type == TKN_DIV || m_current.type == TKN_MOD) {
 		if (m_current.type == TKN_MUL){
-			op = BinaryExpr::MulOp;
+			op = BinaryOp::MulOp;
 			matchToken(TKN_MUL);
 		}else if (m_current.type == TKN_DIV){
-			op = BinaryExpr::DivOp;
+			op = BinaryOp::DivOp;
 			matchToken(TKN_DIV);
 		}else if (m_current.type == TKN_MOD){
-			op = BinaryExpr::ModOp;
+			op = BinaryOp::ModOp;
 			matchToken(TKN_MOD);
 		}else
 			showError();
@@ -436,7 +438,7 @@ Type* SyntaticAnalysis::procValue() {
 	}else if (m_current.type == TKN_STRING){
 		return procString();
 	}else
-		return showError();
+		showError();
 	return NULL;
 }
 
