@@ -1,7 +1,7 @@
 #include "Memory.h"
 
 std::map<std::string, Type*> Memory::m_memory;
-std::set<std::string, Memory::consts;
+std::set<std::string>, Memory::consts;
 
 int Memory::read(const std::string& name) {
 	return Memory::m_memory[name];
