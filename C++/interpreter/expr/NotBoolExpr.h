@@ -5,13 +5,13 @@
 
 class NotBoolExpr : public BoolExpr {
 	public:
-		NotBoolExpr(int line, BoolExpr expr);
+		NotBoolExpr(int line, BoolExpr* expr);
 		virtual ~NotBoolExpr();
 		int line();
 		bool expr();
 
 	private:
-		BoolExpr m_expr;
+		BoolExpr* m_expr;
 };
 
 #endif

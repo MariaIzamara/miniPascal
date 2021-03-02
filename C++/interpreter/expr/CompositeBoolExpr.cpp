@@ -6,7 +6,6 @@ CompositeBoolExpr::CompositeBoolExpr(int line, BoolExpr* left, BoolOp* op, BoolE
 
 CompositeBoolExpr::~CompositeBoolExpr() {
 	delete m_left;
-	delete m_op;
 	delete m_right;
 }
 
@@ -20,10 +19,10 @@ bool CompositeBoolExpr::expr() {
 
 	switch(*CompositeBoolExpr::m_op) {
 		case BoolOp::And:
-			return var_left && var_right;
+			return var_left and var_right;
 			break;
 		case BoolOp::Or:
-			return var_left || var_right;
+			return var_left or var_right;
 			break;
 		default:
 			return NULL;

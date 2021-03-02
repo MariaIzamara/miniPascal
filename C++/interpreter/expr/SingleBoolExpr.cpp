@@ -6,7 +6,6 @@ SingleBoolExpr::SingleBoolExpr(int line, Expr* left, RelOp* op, Expr* right)
 
 SingleBoolExpr::~SingleBoolExpr() {
 	delete m_left;
-	delete m_op;
 	delete m_right;
 }
 
