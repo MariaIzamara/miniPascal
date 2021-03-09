@@ -1,7 +1,7 @@
 #include "./CaseCommand.h"
 
 CaseCommand::CaseCommand(int line, Expr* expr)
-  : Command(line), m_expr(expr), otherwise(NULL) {
+  : Command(line), m_expr(expr), m_otherwise(NULL) {
 }
 
 CaseCommand::~CaseCommand() {

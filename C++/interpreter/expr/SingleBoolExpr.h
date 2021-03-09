@@ -1,6 +1,7 @@
 #ifndef SINGLE_BOOL_EXPR_H
 #define SINGLE_BOOL_EXPR_H
 
+#include <iostream>
 #include "BoolExpr.h"
 #include "Expr.h"
 #include "RelOp.h"

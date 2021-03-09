@@ -1,6 +1,7 @@
 #ifndef BINARY_EXPR_H
 #define BINARY_EXPR_H
 
+#include <iostream>
 #include "Expr.h"
 #include "BinaryOp.h"
 #include "../value/Type.h"

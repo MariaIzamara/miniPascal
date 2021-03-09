@@ -8,7 +8,7 @@
 
 class Memory {
 	public:
-		static void registryVariable(const std::string& name, Type* value = NULL);
+		static void registryVariable(const std::string& name, Type* value);
 		static void registryConstant(const std::string& name, Type* value);
 
 		static Type* read(const std::string& name);

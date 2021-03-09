@@ -1,6 +1,7 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 
+#include <string>
 #include "Expr.h"
 #include "../util/Memory.h"
 #include "../value/StringValue.h"
@@ -8,14 +9,14 @@
 
 class Variable : public Expr {
 	public:
-		Variable(int line, StringValue* name);
+		Variable(int line, const std::string& name);
 		virtual ~Variable();
 		Type* expr();
 		void setValue(Type* value);
-		StringValue* name();
+		const std::string& name();
 
 	private:
-		StringValue* m_name;
+		std::string m_name;
 };
 
 #endif

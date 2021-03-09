@@ -1,6 +1,7 @@
 #ifndef COMPOSITE_BOOL_EXPR_H
 #define COMPOSITE_BOOL_EXPR_H
 
+#include <iostream>
 #include "BoolExpr.h"
 #include "BoolOp.h"
 
